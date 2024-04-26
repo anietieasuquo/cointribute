@@ -1,0 +1,33 @@
+{
+  "name": "cointribute",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cointribute is a crypto-based crowd-funding platform",
+  "workspaces": [
+    "common",
+    "frontend",
+    "server"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "jest test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anietieasuquo/cointribute.git"
+  },
+  "keywords": [
+    "crowdfunding",
+    "crypto",
+    "funding",
+    "ethereum",
+    "polygon",
+    "crytocurrency"
+  ],
+  "author": "anietieasuquo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anietieasuquo/cointribute/issues"
+  },
+  "homepage": "https://github.com/anietieasuquo/cointribute#readme"
+}

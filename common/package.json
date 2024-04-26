@@ -1,0 +1,15 @@
+{
+  "name": "cointribute-common",
+  "version": "1.0.0",
+  "description": "A common module for cointribute",
+  "main": "dist/esm/index.js",
+  "scripts": {
+    "test": "jest test"
+  },
+  "keywords": [
+    "Cointribute",
+    "crypto"
+  ],
+  "author": "anietieasuquo",
+  "license": "MIT"
+}
