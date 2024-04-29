@@ -128,4 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-/client/ethereum/build/
+db/
+test-reports/
+/.scannerwork/

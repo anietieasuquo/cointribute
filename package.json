@@ -4,12 +4,11 @@
   "private": true,
   "description": "Cointribute is a crypto-based crowd-funding platform",
   "workspaces": [
-    "common",
-    "frontend",
-    "server"
+    "packages/*"
   ],
   "main": "index.js",
   "scripts": {
+    "build": "npm run build --workspaces --if-present && npm run test && rm -rf dist && npm run lint && tsc -b",
     "test": "jest test"
   },
   "repository": {
