@@ -5,8 +5,11 @@ pragma solidity ^0.8.9;
 contract CampaignFactory {
     address payable[] public deployedCampaigns;
 
-    function createCampaign(uint minimum) public {
-        address newCampaign = address(new Campaign(minimum, msg.sender));
+    function createCampaign(
+        uint[] memory numbers,
+        string[] memory strings
+    ) public {
+        address newCampaign = address(new Campaign(numbers, strings, msg.sender));
         deployedCampaigns.push(payable(newCampaign));
     }
 
@@ -58,20 +61,45 @@ contract Campaign {
     uint private targetAmount;
     uint private dateCreated;
 
+    constructor (
+        uint[] memory numbers,
+        string[] memory strings,
+        address creator
+    ) {
+        manager = creator;
+        minimumContribution = numbers[0];
+        metaData = MetaData({
+            title: strings[0],
+            subTitle: strings[1],
+            description: strings[2],
+            category: strings[3],
+            subCategory: strings[4],
+            location: strings[5],
+            imageUrl: strings[6],
+            launchDate: numbers[1],
+            durationInDays: numbers[2]
+        });
+        targetAmount = numbers[3];
+        reward = Reward({
+            title: strings[7],
+            description: strings[8],
+            value: numbers[4],
+            imageUrl: strings[9],
+            category: strings[10],
+            availableQuantity: numbers[5],
+            deadLine: numbers[6]
+        });
+        dateCreated = block.timestamp;
+    }
+
     modifier restricted() {
         require(msg.sender == manager);
         _;
     }
 
-    modifier nonManager() {
+    modifier onlyContributors() {
         require(msg.sender != manager);
         _;
-    }
-
-    constructor (uint minimum, address creator) {
-        manager = creator;
-        minimumContribution = minimum;
-        dateCreated = block.timestamp;
     }
 
     function contribute() public payable {
@@ -93,7 +121,7 @@ contract Campaign {
         newRequest.approvalCount = 0;
     }
 
-    function approveRequest(uint index) public nonManager {
+    function approveRequest(uint index) public onlyContributors {
         Request storage request = requests[index];
 
         require(contributors[msg.sender]);

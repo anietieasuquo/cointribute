@@ -1,9 +1,9 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Card, CardGroup } from 'semantic-ui-react';
+import { CardGroup } from 'semantic-ui-react';
 import Link from 'next/link';
 import factory from '@/ethereum/factory';
-import { LoadingIndicator } from '@/components/LoadingIndicator';
+import { NotFoundMessage } from '@/components/NotFoundMessage';
 
 const getDeployedCampaigns = async (): Promise<string[]> => {
   try {
@@ -30,7 +30,7 @@ const CampaignIndex = () => {
 
   const renderCampaigns = () => {
     if (campaigns.length === 0) {
-      return (<LoadingIndicator />);
+      return (<NotFoundMessage content="campaigns" />);
     }
 
     const items = campaigns.map((address: string) => {

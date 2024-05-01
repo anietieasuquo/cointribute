@@ -1,7 +1,8 @@
 import React from 'react';
-import { Metadata, Viewport } from 'next';
+import { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import 'semantic-ui-css/semantic.min.css';
+import './globals.scss';
 
 const inter = Inter({ subsets: ['latin'] });
 const appName = 'Cointribute';
@@ -16,10 +17,6 @@ export const metadata: Metadata = {
   },
   keywords: ['blockchain', 'crowdfunding', 'open-source', 'projects'],
   creator: appName
-};
-
-export const viewport: Viewport = {
-  themeColor: 'black'
 };
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {

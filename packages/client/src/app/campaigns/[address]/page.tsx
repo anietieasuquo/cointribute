@@ -1,25 +1,18 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardGroup,
-  CardHeader,
-  Grid,
-  GridColumn,
-  GridRow
-} from 'semantic-ui-react';
+import { Button, CardGroup, Grid, GridColumn, GridRow, Image, Modal, Segment } from 'semantic-ui-react';
 import web3 from '@/ethereum/web3';
 import { ContributionForm } from '@/components/ContributionForm';
 import { CampaignSummary } from '@/types/dto';
 import { dateTimeFormat, getCampaignSummary } from '@/utils/contract-utils';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
+import { RewardDetails } from '@/components/RewardDetails';
+import { CampaignAdditionalDetails } from '@/components/CampaignAdditionalDetails';
 
 const CampaignShow = ({ params }) => {
   const [campaignSummary, setCampaignSummary] = useState<CampaignSummary | undefined>(undefined);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const loadCampaign = async () => {
     if (!params?.address) return;
@@ -42,9 +35,25 @@ const CampaignShow = ({ params }) => {
       manager,
       contractAddress,
       targetAmount,
-      dateCreated
+      dateCreated,
+      metaData
     } = campaignSummary;
     const list = [
+      {
+        header: metaData?.title,
+        fluid: true,
+        meta: 'Campaign Title',
+        description: metaData?.description,
+        style: { overflowWrap: 'break-word', width: '100%' },
+        image: (
+          <img src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+               style={{ height: '250px', width: 'auto', maxWidth: '100%', overflow: 'hidden', objectFit: 'cover' }}
+               alt={`Campaign image for ${metaData?.title}`}
+          />
+        ),
+        color: 'teal',
+        onClick: () => setShowModal(!showModal)
+      },
       {
         header: contractAddress,
         meta: 'Campaign Address',
@@ -69,13 +78,17 @@ const CampaignShow = ({ params }) => {
       },
       {
         header: web3.utils.fromWei(targetAmount, 'ether'),
-        meta: 'Target Amount',
+        meta: 'Target Amount (ether)',
         description: 'The target amount is the amount of money the manager wants to raise.'
       },
       {
         header: requestsCount,
         meta: 'Requests',
-        description: 'A request tries to withdraw money from the contract. Requests must be approved by contributors.'
+        description: 'A request tries to withdraw money from the contract. Requests must be approved by contributors.',
+        as: 'a',
+        href: `/campaigns/${contractAddress}/requests`,
+        color: 'blue',
+        raised: true
       },
       {
         header: contributorsCount,
@@ -83,7 +96,7 @@ const CampaignShow = ({ params }) => {
         description: 'Number of people who have already donated to this campaign.'
       },
       {
-        header: dateTimeFormat(dateCreated),
+        header: dateTimeFormat(Number(dateCreated)),
         meta: 'Date Created',
         description: 'The date this campaign was created.'
       }
@@ -98,23 +111,48 @@ const CampaignShow = ({ params }) => {
   return campaignSummary !== undefined ? (
     <Grid>
       <GridRow>
-        <GridColumn width={10}>
-          <h3>Campaign Details</h3>
-          <CardGroup>
-            <Card>
-              <CardContent>
-                <CardHeader>{campaignSummary?.metaData?.title}</CardHeader>
-                <CardDescription>
-                  {campaignSummary?.metaData?.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </CardGroup>
+        <GridColumn width={11}>
           {renderSummary()}
+          <Modal
+            onClose={() => setShowModal(false)}
+            onOpen={() => setShowModal(true)}
+            open={showModal}
+            header={`Campaign: ${campaignSummary?.metaData?.title} - ${campaignSummary?.metaData?.subTitle}`}
+            content={<Image src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+                            style={{ width: '100%', height: 'auto' }} />}
+            actions={['Close']}
+            centered={true}
+            dimmer={true}
+            size="large"
+          />
         </GridColumn>
         <GridColumn width={5} floated="right">
-          <h3>Contribute to this Campaign</h3>
-          <ContributionForm address={campaignSummary?.contractAddress || ''} refresh={loadCampaign} />
+          <Grid>
+            <GridRow>
+              <GridColumn>
+                <Segment inverted>
+                  <h3>Contribute to this Campaign</h3>
+                  <ContributionForm address={campaignSummary?.contractAddress || ''} refresh={loadCampaign} />
+                </Segment>
+              </GridColumn>
+            </GridRow>
+            <GridRow>
+              <GridColumn>
+                <Segment>
+                  <h3>Additional Details</h3>
+                  <CampaignAdditionalDetails data={campaignSummary?.metaData!} />
+                </Segment>
+              </GridColumn>
+            </GridRow>
+            <GridRow>
+              <GridColumn>
+                <Segment>
+                  <h3>Reward</h3>
+                  <RewardDetails reward={campaignSummary?.reward!} />
+                </Segment>
+              </GridColumn>
+            </GridRow>
+          </Grid>
         </GridColumn>
       </GridRow>
       <GridRow>

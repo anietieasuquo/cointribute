@@ -1,0 +1,77 @@
+[
+  {
+    "key": "Art",
+    "value": "Art",
+    "text": "Art"
+  },
+  {
+    "key": "Comics",
+    "value": "Comics",
+    "text": "Comics"
+  },
+  {
+    "key": "Crafts",
+    "value": "Crafts",
+    "text": "Crafts"
+  },
+  {
+    "key": "Dance",
+    "value": "Dance",
+    "text": "Dance"
+  },
+  {
+    "key": "Design",
+    "value": "Design",
+    "text": "Design"
+  },
+  {
+    "key": "Fashion",
+    "value": "Fashion",
+    "text": "Fashion"
+  },
+  {
+    "key": "Film & Video",
+    "value": "Film & Video",
+    "text": "Film & Video"
+  },
+  {
+    "key": "Food",
+    "value": "Food",
+    "text": "Food"
+  },
+  {
+    "key": "Games",
+    "value": "Games",
+    "text": "Games"
+  },
+  {
+    "key": "Journalism",
+    "value": "Journalism",
+    "text": "Journalism"
+  },
+  {
+    "key": "Music",
+    "value": "Music",
+    "text": "Music"
+  },
+  {
+    "key": "Photography",
+    "value": "Photography",
+    "text": "Photography"
+  },
+  {
+    "key": "Publishing",
+    "value": "Publishing",
+    "text": "Publishing"
+  },
+  {
+    "key": "Technology",
+    "value": "Technology",
+    "text": "Technology"
+  },
+  {
+    "key": "Theater",
+    "value": "Theater",
+    "text": "Theater"
+  }
+]

@@ -53,3 +53,9 @@ export interface CampaignRequest {
   contributorsCount: number;
   approvals?: RequestApproval[];
 }
+
+export interface KeyValueText {
+  key: string;
+  value: string;
+  text: string;
+}

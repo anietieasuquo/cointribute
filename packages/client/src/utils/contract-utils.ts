@@ -22,16 +22,33 @@ const getCampaignSummary = async (address: string, instance?: Contract<any>): Pr
   };
 };
 
-const dateTimeFormat = (time: number | Date): string => {
-  const date = new Date(time);
+const dateTimeFormat = (_timestamp: number | Date): string => {
+  let timestamp = _timestamp instanceof Date ? _timestamp.getTime() : _timestamp;
+  if (timestamp.toString().length <= 10) {
+    timestamp *= 1000;
+  }
+
+  const date = new Date(timestamp);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   const day = date.getDate();
+
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds();
 
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  const formattedDate = `${year}-${month}-${day}`;
+  const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+  return `${formattedDate} ${formattedTime}`;
 };
 
-export { getCampaignSummary, dateTimeFormat };
+const stringToTimestamp = (strDateTime: string): number => {
+  const parts = strDateTime.split(' ');
+  const dateParts = parts[0].split('-');
+  const dateTimeString: string = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}T${parts[1]}:00`;
+  const dateTime = new Date(dateTimeString);
+  return dateTime.getTime();
+};
+
+export { getCampaignSummary, dateTimeFormat, stringToTimestamp };

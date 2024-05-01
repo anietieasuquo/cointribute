@@ -5,7 +5,7 @@ import compiledFactory from './build/CampaignFactory.json';
 
 const mnemonic = process.env.MNEMONIC;
 const infuraUrl = process.env.INFURA_URL;
-const gasLimit = '1900000';
+const gasLimit = '2900000';
 
 if (!mnemonic || !infuraUrl) {
   throw new Error('Please provide mnemonic and infura url.');
