@@ -1,4 +1,4 @@
-import { CampaignSummary, MetaData, Reward } from '@/types/dto';
+import { CampaignContribution, CampaignSummary, ContributorRankAndPercentage, MetaData, Reward } from '@/types/dto';
 import getCampaignInstance from '@/ethereum/campaign';
 import { Contract } from 'web3';
 
@@ -18,9 +18,28 @@ const getCampaignSummary = async (address: string, instance?: Contract<any>): Pr
     dateCreated: Number(result[6]),
     reward: result[7] as Reward,
     metaData: result[8] as MetaData,
+    contributionsCount: Number(result[9]),
     contractAddress: address
   };
 };
+
+const getCampaignContributions = (async (address: string, instance?: Contract<any>): Promise<CampaignContribution[]> => {
+  console.log('Loading campaign from ethereum server...', address);
+  const campaign = instance ? instance : getCampaignInstance(address);
+  const summary: CampaignSummary = await getCampaignSummary(address, campaign);
+  let count = 0;
+  return (await Promise.all(
+    Array(summary.contributionsCount).fill(0).map(async (element, index) => {
+      const request = (await campaign.methods.contributions(index).call()) as any;
+      return {
+        id: String(++count),
+        contributor: request.contributor as string,
+        value: Number(request.value),
+        dateCreated: Number(request.dateCreated)
+      };
+    })
+  ));
+});
 
 const dateTimeFormat = (_timestamp: number | Date): string => {
   let timestamp = _timestamp instanceof Date ? _timestamp.getTime() : _timestamp;
@@ -51,4 +70,41 @@ const stringToTimestamp = (strDateTime: string): number => {
   return dateTime.getTime();
 };
 
-export { getCampaignSummary, dateTimeFormat, stringToTimestamp };
+const amountString = (amount: number, percentage?: boolean | undefined): string => {
+  return `${(amount || 0).toFixed(2)}${percentage ? '%' : ''}`;
+};
+
+const getContributorRankAndPercentage = (address: string, contributions: CampaignContribution[]): ContributorRankAndPercentage => {
+  if (contributions.length === 0) {
+    throw new Error('Contributions is empty.');
+  }
+
+  const totalContributions: { [key: string]: number } = {};
+  let totalAmount = 0;
+  contributions.forEach(contribution => {
+    totalContributions[contribution.contributor] = (totalContributions[contribution.contributor] || 0) + contribution.value;
+    totalAmount += contribution.value;
+  });
+
+  const sortedContributors = Object.entries(totalContributions)
+    .sort((a, b) => b[1] - a[1]);
+
+  const userIndex = sortedContributors.findIndex(([contributor, _]) => contributor === address);
+  if (userIndex === -1) {
+    throw new Error('Contributor not found.');
+  }
+
+  const contributorTotalContribution = totalContributions[address];
+  const percentage = (contributorTotalContribution / (totalAmount > 0 ? totalAmount : 1)) * 100;
+  const rank = userIndex + 1;
+  return { percentage, rank };
+};
+
+export {
+  getCampaignSummary,
+  getCampaignContributions,
+  dateTimeFormat,
+  stringToTimestamp,
+  amountString,
+  getContributorRankAndPercentage
+};

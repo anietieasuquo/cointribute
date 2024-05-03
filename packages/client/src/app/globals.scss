@@ -1,8 +1,7 @@
-$primary-color: white;
+@import "@/styles/variables";
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: $foreground;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,6 +13,6 @@ $primary-color: white;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background-color: $primary-color;
+  color: $foreground;
+  background-color: $background;
 }

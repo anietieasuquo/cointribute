@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "compile": "npx tsx src/ethereum/compile.ts",
-    "deploy": "npx tsx src/ethereum/deploy.ts",
+    "dev": "source .env && next dev",
+    "build": "source .env && next build",
+    "start": "source .env && next start",
+    "compile": "source .env && npx tsx src/ethereum/compile.ts",
+    "deploy": "source .env && npx tsx src/ethereum/deploy.ts",
     "lint": "next lint"
   },
   "dependencies": {
@@ -33,6 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "autoprefixer": "^10.4.19",
+    "circular-dependency-plugin": "^5.2.2",
     "dotenv": "^16.4.5",
     "eslint": "^8",
     "eslint-config-next": "^14.2.3",

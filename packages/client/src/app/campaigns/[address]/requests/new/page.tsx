@@ -4,9 +4,9 @@ import { Button, Form, Input, Message, MessageHeader } from 'semantic-ui-react';
 import getCampaignInstance from '@/ethereum/campaign';
 import web3 from '@/ethereum/web3';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { CampaignSummary } from '@/types/dto';
 import { getCampaignSummary } from '@/utils/contract-utils';
+import { PageHeader } from '@/components/PageHeader';
 
 const RequestNew = ({ params }) => {
   const router = useRouter();
@@ -67,12 +67,7 @@ const RequestNew = ({ params }) => {
 
   return (
     <div>
-      <h3>Create a Request</h3>
-      <div style={{ margin: '10px 0' }}>
-        <Link href={`/campaigns/${contractAddress}/requests`} aria-disabled={loading}>
-          Back
-        </Link>
-      </div>
+      <PageHeader title="Create a Request" />
       <Form onSubmit={handleCreate} error={errorMessage !== undefined}>
         <Form.Field>
           <label>Description</label>

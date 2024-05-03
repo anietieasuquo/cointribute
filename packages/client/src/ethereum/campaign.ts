@@ -1,5 +1,5 @@
-import web3 from './web3';
 import { Contract } from 'web3';
+import web3 from '@/ethereum/web3';
 import Campaign from '@/ethereum/build/Campaign.json';
 
 const getCampaignInstance = (address: string): Contract<any> => {

@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Button, CardGroup, Grid, GridColumn, GridRow, Image, Modal, Segment } from 'semantic-ui-react';
 import web3 from '@/ethereum/web3';
@@ -9,16 +9,20 @@ import { dateTimeFormat, getCampaignSummary } from '@/utils/contract-utils';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
 import { RewardDetails } from '@/components/RewardDetails';
 import { CampaignAdditionalDetails } from '@/components/CampaignAdditionalDetails';
+import '@/app/campaigns/[address]/styles.scss';
+import { PageHeader } from '@/components/PageHeader';
+import { NotFoundMessage } from '@/components/NotFoundMessage';
 
 const CampaignShow = ({ params }) => {
   const [campaignSummary, setCampaignSummary] = useState<CampaignSummary | undefined>(undefined);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const loadCampaign = async () => {
+  const loadCampaign = useCallback(async () => {
     if (!params?.address) return;
     const summary: CampaignSummary = await getCampaignSummary(params.address as string);
     setCampaignSummary(summary);
-  };
+  }, [params]);
 
   const renderSummary = () => {
     if (!campaignSummary) {
@@ -32,6 +36,7 @@ const CampaignShow = ({ params }) => {
       balance,
       requestsCount,
       contributorsCount,
+      contributionsCount,
       manager,
       contractAddress,
       targetAmount,
@@ -46,13 +51,14 @@ const CampaignShow = ({ params }) => {
         description: metaData?.description,
         style: { overflowWrap: 'break-word', width: '100%' },
         image: (
-          <img src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
-               style={{ height: '250px', width: 'auto', maxWidth: '100%', overflow: 'hidden', objectFit: 'cover' }}
-               alt={`Campaign image for ${metaData?.title}`}
+          <img
+            src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+            alt={`Campaign image for ${metaData?.title}`}
           />
         ),
         color: 'teal',
-        onClick: () => setShowModal(!showModal)
+        onClick: () => setShowModal(!showModal),
+        className: 'campaign-hero'
       },
       {
         header: contractAddress,
@@ -93,7 +99,20 @@ const CampaignShow = ({ params }) => {
       {
         header: contributorsCount,
         meta: 'Contributors',
-        description: 'Number of people who have already donated to this campaign.'
+        description: 'Number of people who have already donated to this campaign.',
+        as: 'a',
+        href: `/campaigns/${contractAddress}/contributors`,
+        color: 'blue',
+        raised: true
+      },
+      {
+        header: contributionsCount,
+        meta: 'Contributions',
+        description: 'Number of contributions made to this campaign.',
+        as: 'a',
+        href: `/campaigns/${contractAddress}/contributions`,
+        color: 'blue',
+        raised: true
       },
       {
         header: dateTimeFormat(Number(dateCreated)),
@@ -105,66 +124,75 @@ const CampaignShow = ({ params }) => {
   };
 
   useEffect(() => {
-    loadCampaign().then(() => console.log('Campaign loaded'));
-  }, []);
+    setLoading(true);
+    loadCampaign().finally(() => setLoading(false));
+  }, [loadCampaign]);
 
-  return campaignSummary !== undefined ? (
-    <Grid>
-      <GridRow>
-        <GridColumn width={11}>
-          {renderSummary()}
-          <Modal
-            onClose={() => setShowModal(false)}
-            onOpen={() => setShowModal(true)}
-            open={showModal}
-            header={`Campaign: ${campaignSummary?.metaData?.title} - ${campaignSummary?.metaData?.subTitle}`}
-            content={<Image src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
-                            style={{ width: '100%', height: 'auto' }} />}
-            actions={['Close']}
-            centered={true}
-            dimmer={true}
-            size="large"
-          />
-        </GridColumn>
-        <GridColumn width={5} floated="right">
+  return (
+    <div>
+      <PageHeader title="Campaign Details">
+        <Link href="/campaigns/new">
+          <Button content="New Campaign" icon="add circle" primary floated="right" />
+        </Link>
+      </PageHeader>
+      {loading ? (<LoadingIndicator />) : campaignSummary === undefined ?
+        <NotFoundMessage content="campaign details" /> : (
           <Grid>
             <GridRow>
-              <GridColumn>
-                <Segment inverted>
-                  <h3>Contribute to this Campaign</h3>
-                  <ContributionForm address={campaignSummary?.contractAddress || ''} refresh={loadCampaign} />
-                </Segment>
+              <GridColumn width={11}>
+                {renderSummary()}
+                <Modal
+                  onClose={() => setShowModal(false)}
+                  onOpen={() => setShowModal(true)}
+                  open={showModal}
+                  header={`Campaign: ${campaignSummary?.metaData?.title} - ${campaignSummary?.metaData?.subTitle}`}
+                  content={<Image src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+                                  style={{ width: '100%', height: 'auto' }} />}
+                  actions={['Close']}
+                  centered={true}
+                  dimmer={true}
+                  size="large"
+                />
+              </GridColumn>
+              <GridColumn width={5} floated="right">
+                <Grid>
+                  <GridRow>
+                    <GridColumn>
+                      <Segment inverted>
+                        <h3>Contribute to this Campaign</h3>
+                        <ContributionForm address={campaignSummary?.contractAddress || ''} refresh={loadCampaign} />
+                      </Segment>
+                    </GridColumn>
+                  </GridRow>
+                  <GridRow>
+                    <GridColumn>
+                      <Segment>
+                        <h3>Additional Details</h3>
+                        <CampaignAdditionalDetails data={campaignSummary?.metaData!} />
+                      </Segment>
+                    </GridColumn>
+                  </GridRow>
+                  <GridRow>
+                    <GridColumn>
+                      <Segment>
+                        <h3>Reward</h3>
+                        <RewardDetails reward={campaignSummary?.reward!} />
+                      </Segment>
+                    </GridColumn>
+                  </GridRow>
+                </Grid>
               </GridColumn>
             </GridRow>
             <GridRow>
               <GridColumn>
-                <Segment>
-                  <h3>Additional Details</h3>
-                  <CampaignAdditionalDetails data={campaignSummary?.metaData!} />
-                </Segment>
-              </GridColumn>
-            </GridRow>
-            <GridRow>
-              <GridColumn>
-                <Segment>
-                  <h3>Reward</h3>
-                  <RewardDetails reward={campaignSummary?.reward!} />
-                </Segment>
+                <Link href={`/campaigns/${campaignSummary?.contractAddress || ''}/requests`}>
+                  <Button content="View Requests" primary />
+                </Link>
               </GridColumn>
             </GridRow>
           </Grid>
-        </GridColumn>
-      </GridRow>
-      <GridRow>
-        <GridColumn>
-          <Link href={`/campaigns/${campaignSummary?.contractAddress || ''}/requests`}>
-            <Button content="View Requests" primary />
-          </Link>
-        </GridColumn>
-      </GridRow>
-    </Grid>
-  ) : (
-    <LoadingIndicator />
+        )}
+    </div>
   );
 };
 

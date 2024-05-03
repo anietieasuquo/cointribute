@@ -18,6 +18,7 @@ import web3 from '@/ethereum/web3';
 import { categories, countries, subCategories } from '@cointribute/common';
 import { stringToTimestamp } from '@/utils/contract-utils';
 import factory from '@/ethereum/factory';
+import { PageHeader } from '@/components/PageHeader';
 
 const CampaignNew = () => {
   const router = useRouter();
@@ -132,7 +133,7 @@ const CampaignNew = () => {
 
   return (
     <div>
-      <h3>Create a Campaign</h3>
+      <PageHeader title="Create a Campaign" />
       <Form onSubmit={handleCreate} error={errorMessage !== undefined}>
         <Grid>
           <GridRow className="equal width">
@@ -187,7 +188,7 @@ const CampaignNew = () => {
                       compact
                       options={countries}
                       defaultValue="US"
-                      onChange={(e, { text }) => setLocation(text as string)}
+                      onChange={(e, { value }) => setLocation(value as string)}
                       disabled={loading}
                     />
                     <Button type="submit">Search</Button>
@@ -313,7 +314,7 @@ const CampaignNew = () => {
                   <p>{errorMessage}</p>
                 </Message>
               )}
-              <Button content="New Campaign" primary onClick={handleCreate} disabled={loading} loading={loading} />
+              <Button content="Create Campaign" primary onClick={handleCreate} disabled={loading} loading={loading} />
             </GridColumn>
           </GridRow>
         </Grid>

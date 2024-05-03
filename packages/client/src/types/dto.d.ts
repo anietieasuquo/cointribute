@@ -29,6 +29,7 @@ export interface CampaignSummary {
   contractAddress: string;
   targetAmount: number;
   dateCreated: number;
+  contributionsCount?: number;
   reward?: Reward;
   metaData?: MetaData;
 }
@@ -52,10 +53,26 @@ export interface CampaignRequest {
   approvalCount: number;
   contributorsCount: number;
   approvals?: RequestApproval[];
+  dateCreated: number;
 }
 
-export interface KeyValueText {
-  key: string;
-  value: string;
-  text: string;
+export interface CampaignContribution {
+  id: string;
+  contributor: string;
+  value: number;
+  dateCreated: number;
+}
+
+export interface CampaignContributor {
+  id: string;
+  contributor: string;
+  totalContribution: number;
+  lastContributionDate: number;
+  shareHolding: number;
+  rank: number;
+}
+
+export interface ContributorRankAndPercentage {
+  percentage: number;
+  rank: number;
 }

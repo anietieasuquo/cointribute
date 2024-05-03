@@ -1,11 +1,11 @@
 import 'dotenv/config';
 import HDWalletProvider from '@truffle/hdwallet-provider';
 import { Web3 } from 'web3';
-import compiledFactory from './build/CampaignFactory.json';
+import compiledFactory from '@/ethereum/build/CampaignFactory.json';
 
 const mnemonic = process.env.MNEMONIC;
-const infuraUrl = process.env.INFURA_URL;
-const gasLimit = '2900000';
+const infuraUrl = process.env.NEXT_PUBLIC_INFURA_URL;
+const gasLimit = process.env.GAS_LIMIT || '1000000';
 
 if (!mnemonic || !infuraUrl) {
   throw new Error('Please provide mnemonic and infura url.');

@@ -90,7 +90,7 @@ const RequestRow = ({ request, index, campaignAddress, isManager, setMessage, re
   return (
     <>
       <TableRow key={id} disabled={complete} positive={readyToFinalize && !complete}>
-        <TableCell>{id}</TableCell>
+        <TableCell>{++index}</TableCell>
         <TableCell>{description}</TableCell>
         <TableCell>{web3.utils.fromWei(value, 'ether')}</TableCell>
         <TableCell>{recipient}</TableCell>

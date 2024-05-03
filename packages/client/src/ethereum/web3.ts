@@ -2,7 +2,7 @@ import 'dotenv/config';
 import Web3 from 'web3';
 import { RegisteredSubscription } from 'web3-eth';
 
-const infuraUrl = 'https://holesky.infura.io/v3/baf7f3491e04497b8693f6d4d03b555b';
+const infuraUrl = process.env.NEXT_PUBLIC_INFURA_URL;
 
 if (!infuraUrl) {
   throw new Error(`Please provide infura url: ${infuraUrl}`);

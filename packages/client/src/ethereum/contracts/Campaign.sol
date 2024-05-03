@@ -26,7 +26,20 @@ contract Campaign {
         address recipient;
         bool complete;
         uint approvalCount;
+        uint dateCreated;
         mapping(address => bool) approvals;
+    }
+
+    struct Contribution {
+        address contributor;
+        uint value;
+        uint dateCreated;
+    }
+
+    struct Contributor {
+        address contributor;
+        uint totalContribution;
+        uint lastContributionDate;
     }
 
     struct Reward {
@@ -56,8 +69,11 @@ contract Campaign {
     MetaData private metaData;
     address private manager;
     uint private minimumContribution;
-    mapping(address => bool) private contributors;
+    mapping(address => Contributor) private contributors;
+    Contributor[] public contributorsList;
+    Contribution[] public contributions;
     uint private contributorsCount;
+    uint private contributionsCount;
     uint private targetAmount;
     uint private dateCreated;
 
@@ -105,10 +121,25 @@ contract Campaign {
     function contribute() public payable {
         require(msg.value > minimumContribution);
 
-        if (contributors[msg.sender] != true) {
+        Contributor memory contributor = Contributor({
+            contributor: msg.sender,
+            totalContribution: contributors[msg.sender].totalContribution + msg.value,
+            lastContributionDate: block.timestamp
+        });
+
+        if (contributors[msg.sender].lastContributionDate == 0) {
             contributorsCount++;
+            contributorsList.push(contributor);
         }
-        contributors[msg.sender] = true;
+
+        contributors[msg.sender] = contributor;
+        Contribution memory newContribution = Contribution({
+            contributor: msg.sender,
+            value: msg.value,
+            dateCreated: block.timestamp
+        });
+        contributions.push(newContribution);
+        contributionsCount++;
     }
 
     function createRequest(string memory description, uint value, address recipient) public restricted {
@@ -119,12 +150,13 @@ contract Campaign {
         newRequest.recipient = recipient;
         newRequest.complete = false;
         newRequest.approvalCount = 0;
+        newRequest.dateCreated = block.timestamp;
     }
 
     function approveRequest(uint index) public onlyContributors {
         Request storage request = requests[index];
 
-        require(contributors[msg.sender]);
+        require(contributors[msg.sender].lastContributionDate != 0);
         require(!request.approvals[msg.sender]);
 
         request.approvals[msg.sender] = true;
@@ -141,7 +173,7 @@ contract Campaign {
         request.complete = true;
     }
 
-    function getSummary() public view returns (uint, uint, uint, uint, address, uint, uint, Reward memory, MetaData memory) {
+    function getSummary() public view returns (uint, uint, uint, uint, address, uint, uint, Reward memory, MetaData memory, uint) {
         return (
             minimumContribution,
             address(this).balance,
@@ -151,7 +183,12 @@ contract Campaign {
             targetAmount,
             dateCreated,
             reward,
-            metaData
+            metaData,
+            contributionsCount
         );
+    }
+
+    function getContributorSummary(address contributor) public view returns (Contributor memory) {
+        return contributors[contributor];
     }
 }
