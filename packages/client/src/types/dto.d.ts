@@ -1,3 +1,5 @@
+import { GenericObject } from '@/core/types';
+
 export interface Reward {
   title: string;
   description: string;
@@ -75,4 +77,9 @@ export interface CampaignContributor {
 export interface ContributorRankAndPercentage {
   percentage: number;
   rank: number;
+}
+
+export interface IPFSResponse {
+  readonly imageMap: GenericObject;
+  readonly cid: string;
 }

@@ -1,5 +1,5 @@
 'use client';
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import {
   Button,
   Form,
@@ -19,6 +19,12 @@ import { categories, countries, subCategories } from '@cointribute/common';
 import { stringToTimestamp } from '@/utils/contract-utils';
 import factory from '@/ethereum/factory';
 import { PageHeader } from '@/components/PageHeader';
+import { MediaType } from '@/core/domain/MediaType';
+import { Buffer } from 'buffer';
+import { KeyValue, MediaItem } from '@/core/types';
+import { createPaddedHex } from '@/utils/common-utils';
+import { processIPFSRequest } from '@/utils/media-util';
+import { IPFSResponse } from '@/types/dto';
 
 const CampaignNew = () => {
   const router = useRouter();
@@ -29,14 +35,13 @@ const CampaignNew = () => {
   const [category, setCategory] = useState('');
   const [subCategory, setSubCategory] = useState('');
   const [location, setLocation] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
   const [launchDate, setLaunchDate] = useState('');
   const [durationInDays, setDurationInDays] = useState('');
   const [targetAmount, setTargetAmount] = useState('');
   const [rewardTitle, setRewardTitle] = useState('');
   const [rewardDescription, setRewardDescription] = useState('');
   const [rewardValue, setRewardValue] = useState('');
-  const [rewardImageUrl, setRewardImageUrl] = useState('');
+  const [image, setImage] = useState<KeyValue<MediaType, Buffer> | undefined>(undefined);
   const [rewardCategory, setRewardCategory] = useState('');
   const [rewardAvailabilityQuantity, setRewardAvailabilityQuantity] = useState('');
   const [rewardDeadLine, setRewardDeadLine] = useState('');
@@ -54,14 +59,13 @@ const CampaignNew = () => {
         category,
         subCategory,
         location,
-        imageUrl,
         launchDate,
         durationInDays,
         targetAmount,
         rewardTitle,
         rewardDescription,
         rewardValue,
-        rewardImageUrl,
+        image,
         rewardCategory,
         rewardAvailabilityQuantity,
         rewardDeadLine
@@ -87,10 +91,47 @@ const CampaignNew = () => {
         return;
       }
 
+      console.log('Image:', image);
+      console.log('Image Campaign:', MediaType.CAMPAIGN);
+
+      const campaignImage: Buffer | undefined = image ? image[MediaType.CAMPAIGN] : undefined;
+      if (!campaignImage) {
+        setErrorMessage('Campaign Image is required.');
+        return;
+      }
+
+      const rewardImage: Buffer | undefined = image ? image[MediaType.REWARD] : undefined;
+      if (!rewardImage) {
+        setErrorMessage('Reward Image is required.');
+        return;
+      }
+
+      const accounts = await web3.eth.getAccounts();
+
+      const campaignHex = createPaddedHex(1);
+      const rewardHex = createPaddedHex(2);
+      const mediaFiles: MediaItem[] = [
+        {
+          hex: campaignHex,
+          file: campaignImage,
+          type: MediaType.CAMPAIGN,
+          campaignName: title,
+          creator: accounts[0]
+        },
+        {
+          hex: rewardHex,
+          file: rewardImage,
+          type: MediaType.REWARD,
+          campaignName: rewardTitle,
+          creator: accounts[0]
+        }
+      ];
+
       setErrorMessage(undefined);
       setLoading(true);
+
+      const { imageMap }: IPFSResponse = await processIPFSRequest(mediaFiles);
       console.log('Creating campaign with minimum contribution:', minimumContribution);
-      const accounts = await web3.eth.getAccounts();
       const numbers = [
         Number(minimumContribution),
         stringToTimestamp(launchDate),
@@ -107,10 +148,10 @@ const CampaignNew = () => {
         category,
         subCategory,
         location,
-        imageUrl,
+        imageMap[campaignHex],
         rewardTitle,
         rewardDescription,
-        rewardImageUrl,
+        imageMap[rewardHex],
         rewardCategory
       ];
       console.log('Numbers:', numbers);
@@ -128,6 +169,29 @@ const CampaignNew = () => {
       setErrorMessage(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fileToBuffer = (file: any): Promise<Buffer> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const arrayBuffer: ArrayBuffer = reader.result as ArrayBuffer;
+        const buffer = Buffer.from(arrayBuffer);
+        resolve(buffer);
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  };
+
+  const handleFileInputChange = async (event: any, type: MediaType) => {
+    const file = event.target.files[0];
+    if (file) {
+      const buffer = await fileToBuffer(file);
+      console.log('File converted to Buffer:', { type, buffer });
+      const newImage = { ...image, [type]: buffer };
+      setImage(newImage);
     }
   };
 
@@ -198,7 +262,7 @@ const CampaignNew = () => {
                   <label>Image</label>
                   <Input
                     type="file"
-                    onChange={(e) => setImageUrl(e.target.value)}
+                    onChange={(e) => handleFileInputChange(e, MediaType.CAMPAIGN)}
                     disabled={loading}
                   />
                 </Form.Field>
@@ -272,7 +336,7 @@ const CampaignNew = () => {
                   <label>Reward Image</label>
                   <Input
                     type="file"
-                    onChange={(e) => setRewardImageUrl(e.target.value)}
+                    onChange={(e) => handleFileInputChange(e, MediaType.REWARD)}
                     disabled={loading}
                   />
                 </Form.Field>

@@ -12,6 +12,8 @@ import { CampaignAdditionalDetails } from '@/components/CampaignAdditionalDetail
 import '@/app/campaigns/[address]/styles.scss';
 import { PageHeader } from '@/components/PageHeader';
 import { NotFoundMessage } from '@/components/NotFoundMessage';
+import { ipfsToUrl } from '@/utils/common-utils';
+import { metadata } from '@/app/layout';
 
 const CampaignShow = ({ params }) => {
   const [campaignSummary, setCampaignSummary] = useState<CampaignSummary | undefined>(undefined);
@@ -52,7 +54,7 @@ const CampaignShow = ({ params }) => {
         style: { overflowWrap: 'break-word', width: '100%' },
         image: (
           <img
-            src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+            src={ipfsToUrl(metaData?.imageUrl!)}
             alt={`Campaign image for ${metaData?.title}`}
           />
         ),
@@ -146,7 +148,7 @@ const CampaignShow = ({ params }) => {
                   onOpen={() => setShowModal(true)}
                   open={showModal}
                   header={`Campaign: ${campaignSummary?.metaData?.title} - ${campaignSummary?.metaData?.subTitle}`}
-                  content={<Image src="https://react.semantic-ui.com/images/avatar/large/matthew.png"
+                  content={<Image src={ipfsToUrl(campaignSummary?.metaData?.imageUrl!)}
                                   style={{ width: '100%', height: 'auto' }} />}
                   actions={['Close']}
                   centered={true}
