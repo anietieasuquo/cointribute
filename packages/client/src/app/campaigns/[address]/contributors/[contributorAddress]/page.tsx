@@ -5,7 +5,6 @@ import web3 from '@/ethereum/web3';
 import { CampaignContributor } from '@/types/dto';
 import {
   amountString,
-  dateTimeFormat,
   getCampaignContributions,
   getContributorRankAndPercentage
 } from '@/utils/contract-utils';
@@ -14,6 +13,7 @@ import '@/app/campaigns/[address]/contributors/[contributorAddress]/styles.scss'
 import getCampaignInstance from '@/ethereum/campaign';
 import { NotFoundMessage } from '@/components/NotFoundMessage';
 import { PageHeader } from '@/components/PageHeader';
+import { dateTimeFormat } from '@/utils/common-utils';
 
 const ContributorShow = ({ params }) => {
   const [contributor, setContributor] = useState<CampaignContributor | undefined>(undefined);

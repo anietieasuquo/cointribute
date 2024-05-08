@@ -2,9 +2,8 @@
 import React from 'react';
 import { List, ListItem } from 'semantic-ui-react';
 import { Reward } from '@/types/dto';
-import { dateTimeFormat } from '@/utils/contract-utils';
 import web3 from '@/ethereum/web3';
-import { ipfsToUrl } from '@/utils/common-utils';
+import { dateTimeFormat, ipfsToUrl } from '@/utils/common-utils';
 
 const RewardDetails = ({ reward }: { reward: Reward }) => {
   const { title, description, value, imageUrl, category, availableQuantity, deadLine } = reward;

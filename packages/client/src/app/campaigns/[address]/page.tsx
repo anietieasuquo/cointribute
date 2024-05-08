@@ -5,15 +5,14 @@ import { Button, CardGroup, Grid, GridColumn, GridRow, Image, Modal, Segment } f
 import web3 from '@/ethereum/web3';
 import { ContributionForm } from '@/components/ContributionForm';
 import { CampaignSummary } from '@/types/dto';
-import { dateTimeFormat, getCampaignSummary } from '@/utils/contract-utils';
+import { getCampaignSummary } from '@/utils/contract-utils';
 import { LoadingIndicator } from '@/components/LoadingIndicator';
 import { RewardDetails } from '@/components/RewardDetails';
 import { CampaignAdditionalDetails } from '@/components/CampaignAdditionalDetails';
 import '@/app/campaigns/[address]/styles.scss';
 import { PageHeader } from '@/components/PageHeader';
 import { NotFoundMessage } from '@/components/NotFoundMessage';
-import { ipfsToUrl } from '@/utils/common-utils';
-import { metadata } from '@/app/layout';
+import { dateTimeFormat, ipfsToUrl } from '@/utils/common-utils';
 
 const CampaignShow = ({ params }) => {
   const [campaignSummary, setCampaignSummary] = useState<CampaignSummary | undefined>(undefined);

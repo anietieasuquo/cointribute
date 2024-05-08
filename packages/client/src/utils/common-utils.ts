@@ -169,18 +169,6 @@ const capitalize = (arg: string): string => {
   return arg.charAt(0).toUpperCase() + arg.slice(1).toLowerCase();
 };
 
-const dateTimeFormat = (time: number | Date): string => {
-  const date = new Date(time);
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const seconds = date.getSeconds();
-
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-};
-
 const mapErrorMessage = (error: any): string => {
   if (error) {
     if (error?.response?.data?.message) {
@@ -200,6 +188,27 @@ const secondsBetweenDates = (dateA: Date, dateB: Date): number => {
 
 const secondsFromToday = (date: Date | number): number => {
   return Math.abs(new Date().getTime() - new Date(date).getTime()) / 1000;
+};
+
+const dateTimeFormat = (_timestamp: number | Date): string => {
+  let timestamp = _timestamp instanceof Date ? _timestamp.getTime() : _timestamp;
+  if (timestamp.toString().length <= 10) {
+    timestamp *= 1000;
+  }
+
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds();
+
+  const formattedDate = `${year}-${month}-${day}`;
+  const formattedTime = `${hours}:${minutes}:${seconds}`;
+
+  return `${formattedDate} ${formattedTime}`;
 };
 
 const sanitize = (input: string): string => {
@@ -275,11 +284,11 @@ export {
   isTimeElapsed,
   isInThePastOrToday,
   isInThePast,
+  dateTimeFormat,
   addDaysToTimestamp,
   createPaddedHex,
   ipfsToUrl,
   capitalize,
-  dateTimeFormat,
   mapErrorMessage,
   secondsBetweenDates,
   secondsFromToday,

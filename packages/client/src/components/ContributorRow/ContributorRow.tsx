@@ -3,8 +3,9 @@ import React from 'react';
 import { TableCell, TableRow } from 'semantic-ui-react';
 import web3 from '@/ethereum/web3';
 import { CampaignContributor } from '@/types/dto';
-import { amountString, dateTimeFormat } from '@/utils/contract-utils';
+import { amountString } from '@/utils/contract-utils';
 import Link from 'next/link';
+import { dateTimeFormat } from '@/utils/common-utils';
 
 const ContributorRow = ({ contributor, campaignAddress, index, currentAddress }: {
   contributor: CampaignContributor;

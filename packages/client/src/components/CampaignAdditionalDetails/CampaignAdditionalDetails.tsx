@@ -2,7 +2,8 @@
 import React from 'react';
 import { List, ListItem } from 'semantic-ui-react';
 import { MetaData } from '@/types/dto';
-import { dateTimeFormat } from '@/utils/contract-utils';
+
+import { dateTimeFormat } from '@/utils/common-utils';
 
 const CampaignAdditionalDetails = ({ data }: { data: MetaData }) => {
   const { category, subCategory, location, durationInDays, launchDate } = data;
